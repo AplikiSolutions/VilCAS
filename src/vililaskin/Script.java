@@ -1,8 +1,6 @@
 package vililaskin;
 
 
-
-
 import vililaskin.Equation;
 import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
@@ -59,18 +57,18 @@ public class Script extends Equation{
     public void calculate(int object) throws Exception{
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("JavaScript");
-
+        
         for(int i = 0; i < vars.length; i++){
             if(i == object)
                 continue;
-
+            
             engine.put(vars[i].name, get(i));
         }
         
         Vililaskin.constants.keySet().stream().forEach((s) -> {
             engine.put(s, Vililaskin.constants.get(s));
         });
-
+        
         try{
             set(object, ((Number)(engine.eval(vars[object].function))).doubleValue());
         }catch(ScriptException | ClassCastException e){

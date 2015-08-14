@@ -38,9 +38,6 @@ public class Category extends JPanel{
         });
         addEquations();
         
-        if(name.equals("Mathematics")){
-            checkBox.setSelected(true);
-        }
     }
 
 
@@ -71,7 +68,6 @@ public class Category extends JPanel{
             add(s);
         });
         
-        Window.frame.pack();
     }
     
         

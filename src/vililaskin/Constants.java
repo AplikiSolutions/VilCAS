@@ -26,14 +26,16 @@ public class Constants{
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
         
-        //panel in scrollView
+        //panel in scrollView, shows constants
         p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         
+        //middle panel to pack p together
         JPanel midPanel = new JPanel();
         midPanel.add(p);
         midPanel.setBackground(Color.white);
         
+        //actual scrollable view
         JScrollPane scrollPane = new JScrollPane(midPanel);
         scrollPane.setPreferredSize(new Dimension(200, 200));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);

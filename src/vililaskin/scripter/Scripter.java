@@ -272,6 +272,7 @@ public class Scripter{
     }
     
     
+    /*
     public void makeFunction() throws Exception{
         
         frame = new JFrame();
@@ -293,5 +294,6 @@ public class Scripter{
         
         return p;
     }
+    */
     
 }

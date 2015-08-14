@@ -7,7 +7,7 @@ import vililaskin.categories.*;
 
 public class Vililaskin extends JPanel{
     
-    
+    private static Window window;
     public static final ArrayList<Category> categories = new ArrayList();
     public static HashMap<String, Float> constants = new HashMap();
     
@@ -15,13 +15,21 @@ public class Vililaskin extends JPanel{
         
         try{
             
-            Window.makeWindow();
+            window = new Window("Vililaskin");
+            window.build();
             SaveFunctions.loadLocal();
+            
+            
+            //open categories
+            categories.stream().forEach((c) -> {
+                if(c.checkBox.isSelected())
+                    updateCategory(c);
+            });
             
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, "Vililaskin.main: " + e);
             e.printStackTrace(System.out);
-            Window.frame.dispose();
+            window.dispose();
             System.exit(0);
         }
     }//main
@@ -30,26 +38,27 @@ public class Vililaskin extends JPanel{
     
     public static void addCategory(Category c){
         categories.add(c);
-        Window.cc.add(c.checkBox);
-        Window.frame.pack();
+        window.cc.add(c.checkBox);
+        window.panel.revalidate();
     }//addCategory
     
     
     public static void removeCategory(Category c){
         categories.remove(c);
-        Window.cc.remove(c.checkBox);
-        Window.panel.remove(c);
-        Window.frame.pack();
+        window.cc.remove(c.checkBox);
+        window.panel.remove(c);
+        window.panel.revalidate();
     }//removeCategory
     
     
     public static void updateCategory(Category c){
         if(c.checkBox.isSelected())
-            Window.panel.add(c);
+            window.panel.add(c);
         else
-            Window.panel.remove(c);
+            window.panel.remove(c);
         
-        Window.frame.pack();
+        window.panel.revalidate();
+        
     }//updateCategories
     
     
@@ -63,6 +72,7 @@ public class Vililaskin extends JPanel{
         Category c = new Category(s.category);
         c.addScript(s);
         addCategory(c);
+        window.panel.revalidate();
     }//addScript
     
     
@@ -75,6 +85,7 @@ public class Vililaskin extends JPanel{
                 break;
             }
         }
+        window.panel.revalidate();
     }//removeScript
     
     
@@ -92,7 +103,7 @@ public class Vililaskin extends JPanel{
         
         SaveFunctions.saveLocally();
 
-        Window.frame.dispose();
+        window.dispose();
         System.exit(0);
     }
 }

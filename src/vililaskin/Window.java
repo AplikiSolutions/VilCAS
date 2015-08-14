@@ -1,80 +1,112 @@
 package vililaskin;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 import vililaskin.scripter.*;
-import vililaskin.categories.Category;
 
-public class Window {
+public class Window extends JFrame{
     
     //TODO finish menu bar
     
-    public static JFrame frame;
-    static JPanel panel;
-    static JMenuBar menuBar;
-    static CategoryChooser cc;
+    JPanel panel;
+    CategoryChooser cc;
     
-    public static void makeWindow(){
-        frame = new JFrame("Vililaskin");
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    private JPanel fullPanel;
+    
+    private static final int WIDTH = 600, HEIGHT = 600;
+    
+    public Window(String s){
+        super(s);
+    }//Window
+    
+    public void build(){
+        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        //vertical top-tier layout
-        panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        //top-tier layout
+        fullPanel = new JPanel();
+        fullPanel.setLayout(new BorderLayout());
+        fullPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         
         makeMenuBar();
         
+        //vertical layout for categories
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        //keeps categories grouped
+        JPanel midPanel = new JPanel();
+        midPanel.add(panel);
+        
+        //scrollable main view
+        JScrollPane scrollPane = new JScrollPane(midPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        fullPanel.add(scrollPane, BorderLayout.CENTER);
+        
         cc = new CategoryChooser();
         cc.initCategories();
-        panel.add(cc);
+        fullPanel.add(cc, BorderLayout.PAGE_START);
+        add(fullPanel);
         
-        for(Category c: Vililaskin.categories){
-            if(c.checkBox.isSelected()){
-                Vililaskin.updateCategory(c);
-            }
-        }
-        
-        frame.add(panel);
-        
-        frame.pack();
         //position frame to center of screen
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation((int)(screen.getWidth() / 2 - frame.getWidth() / 2), 
-            (int)(screen.getHeight() / 2 - 200));
-        frame.setVisible(true);
+        setBounds((int)(screen.getWidth() / 2 - WIDTH / 2), 
+            (int)(screen.getHeight() / 2 - HEIGHT / 2), WIDTH, HEIGHT);
+        setVisible(true);
 
         
-        frame.addWindowListener(new WindowAdapter(){
+        addWindowListener(new WindowAdapter(){
             @Override
             public void windowClosing(WindowEvent e){
                 Vililaskin.quit();
             }
         });
-    }//makeWindow
+    }//build
     
     
-    private static void makeMenuBar(){
-        menuBar = new JMenuBar();
+    //make menu items
+    private void makeMenuBar(){
+        JMenuBar menuBar = new JMenuBar();
         
-        JMenu file = new JMenu("File");
-        file.setMnemonic('F');
+        menuBar.add(makeFile());
+        menuBar.add(makeEdit());
+        menuBar.add(makeView());
+        
+        setJMenuBar(menuBar);
+    }//makeMenuBar
+    
+    
+    //make the "File" item
+    private JMenu makeFile(){
+        JMenu menuItem = new JMenu("File");
+        menuItem.setMnemonic('F');
         
         JMenuItem in = new JMenuItem("Import all functions", KeyEvent.VK_I);
-        in.addActionListener((ActionEvent e) -> {SaveFunctions.loadFromFile();});
-        file.add(in);
+        in.addActionListener((ActionEvent e) -> {
+            SaveFunctions.loadFromFile();
+        });
+        menuItem.add(in);
         
         JMenuItem out = new JMenuItem("Export all functions", KeyEvent.VK_X);
-        out.addActionListener((ActionEvent e) -> {SaveFunctions.saveToFile();});
-        file.add(out);
+        out.addActionListener((ActionEvent e) -> {
+            SaveFunctions.saveToFile();
+        });
+        menuItem.add(out);
         
-        JMenuItem javaScriptIn = new JMenuItem("Import Javascript", KeyEvent.VK_J);
-        javaScriptIn.addActionListener((ActionEvent e) -> {SaveFunctions.loadFromFile();});
-        file.add(javaScriptIn);
+//        JMenuItem javaScriptIn = new JMenuItem("Import Javascript", KeyEvent.VK_J);
+//        javaScriptIn.addActionListener((ActionEvent e) -> {SaveFunctions.loadFromFile();});
+//        menuItem.add(javaScriptIn);
         
-        JMenu create = new JMenu("Edit");
-        create.setMnemonic('E');
+        return menuItem;
+    }//makeFile
+    
+    
+    //make the "Edit" item
+    private JMenu makeEdit(){
+        JMenu menuItem = new JMenu("Edit");
+        menuItem.setMnemonic('E');
         
         JMenuItem constant = new JMenuItem("Edit constants", KeyEvent.VK_C);
         constant.addActionListener((ActionEvent e) -> {
@@ -84,7 +116,7 @@ public class Window {
                 JOptionPane.showMessageDialog(null, ex);
             }
         });
-        create.add(constant);
+        menuItem.add(constant);
         
         JMenuItem script = new JMenuItem("Make new script", KeyEvent.VK_S);
         script.addActionListener((ActionEvent e) -> {
@@ -94,9 +126,21 @@ public class Window {
                 JOptionPane.showMessageDialog(null, ex);
             }
         });
-        create.add(script);
+        menuItem.add(script);
         
+        JCheckBoxMenuItem updateChoice = new JCheckBoxMenuItem("Update variables globally");
+        updateChoice.setToolTipText("<html>When a value is calculated,<br>"
+                + "all fields with that quantity<br>will be updated</html>");
+        updateChoice.setSelected(true);
+        updateChoice.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                Equation.updateAll = updateChoice.isSelected();
+            }
+        });
+        menuItem.add(updateChoice);
         
+        /*
         JMenuItem function = new JMenuItem("Make new function", KeyEvent.VK_F);
         function.addActionListener((ActionEvent e) -> {
             try{
@@ -105,16 +149,44 @@ public class Window {
                 JOptionPane.showMessageDialog(null, ex);
             }
         });
-        create.add(function);
-        
-        JCheckBoxMenuItem update = new JCheckBoxMenuItem("Update variables globally");
-        update.setSelected(true);
-        
-        
-        menuBar.add(file);
-        menuBar.add(create);
-        
-        frame.setJMenuBar(menuBar);
-    }//makeMenuBar
+        menuItem.add(function);
+        */
+        return menuItem;
+    }//makeEdit
     
+    
+    //make the "View" item
+    private JMenu makeView(){
+        JMenu menuItem = new JMenu("View");
+        menuItem.setMnemonic('V');
+        
+        JMenuItem viewAll = new JMenuItem("All functions", KeyEvent.VK_A);
+        viewAll.addActionListener((ActionEvent e) -> {
+            Vililaskin.categories.stream().forEach((c) -> {
+                c.checkBox.setSelected(true);
+                Vililaskin.updateCategory(c);
+            });
+        });
+        menuItem.add(viewAll);
+        
+        JMenuItem viewNone = new JMenuItem("No functions", KeyEvent.VK_N);
+        viewNone.addActionListener((ActionEvent e) -> {
+            Vililaskin.categories.stream().forEach((c) -> {
+                c.checkBox.setSelected(false);
+                Vililaskin.updateCategory(c);
+            });
+        });
+        menuItem.add(viewNone);
+        
+        JCheckBoxMenuItem viewSelector = new JCheckBoxMenuItem("Category select bar");
+        viewSelector.addActionListener((ActionEvent e) -> {
+            cc.setVisible(viewSelector.isSelected());
+            fullPanel.revalidate();
+        });
+        viewSelector.setSelected(true);
+        menuItem.add(viewSelector);
+        
+        
+        return menuItem;
+    }//makeView
 }
