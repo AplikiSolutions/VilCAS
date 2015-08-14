@@ -9,9 +9,13 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import vililaskin.categories.Category;
+
 public class SaveFunctions {
     
     //TODO: make imports and exports in .zip format
+    
+    private static final String fileExt = ".vls";
     
     public static void loadLocal(){
         load(new File(System.getenv("APPDATA") + "\\Vililaskin"));
@@ -19,7 +23,7 @@ public class SaveFunctions {
     
     public static void loadFromFile(){
         JFileChooser fc = new JFileChooser();
-            int returnVal = fc.showOpenDialog(Window.frame);
+            int returnVal = fc.showOpenDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION){
                 load(fc.getSelectedFile());
@@ -36,7 +40,7 @@ public class SaveFunctions {
         //load scripts
         for(File file: targetFile.listFiles()){
             
-            if(!file.getName().endsWith(".vls")){
+            if(!file.getName().endsWith(fileExt)){
                 continue;
             }
             
@@ -83,6 +87,27 @@ public class SaveFunctions {
         props.stringPropertyNames().stream().forEach((s) -> {
             Vililaskin.constants.put(s, Float.valueOf((String)props.get(s)));
         });
+        
+        
+        //load other prefs
+        Properties props2 = new Properties();
+        
+        try(FileInputStream stream = new FileInputStream(
+                new File(targetFile.getAbsolutePath() + "\\preferences.properties"))){
+            props2.load(stream);
+        }catch(IOException e){
+            return;
+        }
+        
+        props2.stringPropertyNames().stream().forEach((s) -> {
+            if(props2.get(s).equals("true")){
+                for(Category c: Vililaskin.categories){
+                    if(s.startsWith(c.name)){
+                        c.checkBox.setSelected(true);
+                    }
+                }
+            }
+        });
     }//load
     
     public static void saveLocally(){
@@ -91,7 +116,7 @@ public class SaveFunctions {
     
     public static void saveToFile(){
         JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(Window.frame);
+        int returnVal = fc.showOpenDialog(null);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             saveScripts(fc.getSelectedFile());
@@ -104,6 +129,11 @@ public class SaveFunctions {
         
         if(!targetFile.isDirectory()){
             targetFile.mkdir();
+        }else{
+            for(File file: targetFile.listFiles()){
+                if(file.getName().endsWith(fileExt))
+                    file.delete();
+            }
         }
         
         for(Script s: scripts){
@@ -140,6 +170,26 @@ public class SaveFunctions {
         
         try(FileOutputStream stream = new FileOutputStream(f)){
             props.store(stream, "Constants for Vililaskin\nDon't edit manually");
+        }catch(IOException e){
+            JOptionPane.showMessageDialog(null, "Couldn't save scripts:\n" + e);
+        }
+        
+        Properties props2 = new Properties();
+        
+        for(Category c: Vililaskin.categories){
+            String s;
+            if(c.checkBox.isSelected())
+                s = "true";
+            else
+                s = "false";
+            
+            props2.put(c.name + "_open", s);
+        }
+        
+        f = new File(targetFile.getAbsolutePath() +  "\\preferences.properties");
+        
+        try(FileOutputStream stream = new FileOutputStream(f)){
+            props2.store(stream, "Preferences for Vililaskin\nDon't edit manually");
         }catch(IOException e){
             JOptionPane.showMessageDialog(null, "Couldn't save scripts:\n" + e);
         }
