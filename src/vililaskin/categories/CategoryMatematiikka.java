@@ -27,8 +27,6 @@
 
 package vililaskin.categories;
 
-import vililaskin.Equation;
-
 
 public class CategoryMatematiikka extends Category{
     

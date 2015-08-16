@@ -27,8 +27,7 @@
 
 package vililaskin.categories;
 
-import vililaskin.Script;
-import vililaskin.Equation;
+import vililaskin.scripter.Script;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

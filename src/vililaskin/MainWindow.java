@@ -27,6 +27,7 @@
 
 package vililaskin;
 
+import vililaskin.categories.Equation;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -42,7 +43,7 @@ public class MainWindow extends JFrame{
     
     private JPanel fullPanel;
     
-    private static final int WIDTH = 600, HEIGHT = 600;
+    private static final int WIDTH = 650, HEIGHT = 600;
     
     public MainWindow(String s){
         super(s);
@@ -69,7 +70,6 @@ public class MainWindow extends JFrame{
         
         //scrollable main view
         JScrollPane scrollPane = new JScrollPane(midPanel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         fullPanel.add(scrollPane, BorderLayout.CENTER);
         
         cc = new CategoryChooser();
@@ -100,6 +100,7 @@ public class MainWindow extends JFrame{
         menuBar.add(makeFile());
         menuBar.add(makeEdit());
         menuBar.add(makeView());
+        menuBar.add(makeExtensions());
         
         setJMenuBar(menuBar);
     }//makeMenuBar
@@ -116,7 +117,7 @@ public class MainWindow extends JFrame{
         });
         menuItem.add(in);
         
-        JMenuItem out = new JMenuItem("Export all functions", KeyEvent.VK_X);
+        JMenuItem out = new JMenuItem("Export all functions");
         out.addActionListener((ActionEvent e) -> {
             SaveFunctions.saveToFile();
         });
@@ -216,4 +217,24 @@ public class MainWindow extends JFrame{
         
         return menuItem;
     }//makeView
+    
+    
+    //make the "Extensions" item
+    private JMenu makeExtensions(){
+        JMenu menuItem = new JMenu("Extensions");
+        menuItem.setMnemonic('X');
+        
+        JMenuItem viewAll = new JMenuItem("Triangle solver", KeyEvent.VK_T);
+        viewAll.addActionListener((ActionEvent e) -> {
+            try{
+                new trianglesolver.Window().start();
+            }catch(Exception ex){
+                JOptionPane.showMessageDialog(null, "MainWindow: " + ex);
+                ex.printStackTrace(System.out);
+            }
+        });
+        menuItem.add(viewAll);
+        
+        return menuItem;
+    }//makeWindow
 }

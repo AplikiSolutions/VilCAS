@@ -27,6 +27,7 @@
 
 package vililaskin;
 
+import vililaskin.scripter.Script;
 import java.util.*;
 import javax.swing.*;
 import vililaskin.categories.*;

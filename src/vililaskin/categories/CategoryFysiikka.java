@@ -27,7 +27,6 @@
 
 package vililaskin.categories;
 
-import vililaskin.Equation;
 import vililaskin.Constants;
 
 

@@ -25,16 +25,17 @@
 * the original code.
 */
 
-package vililaskin;
+package vililaskin.scripter;
 
 
-import vililaskin.Equation;
+import vililaskin.categories.Equation;
 import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.swing.JButton;
+import vililaskin.Vililaskin;
 import vililaskin.Vililaskin;
 import vililaskin.scripter.Scripter;
 

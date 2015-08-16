@@ -25,26 +25,19 @@
 * the original code.
 */
 
-package vililaskin;
+package vililaskin.categories;
 
 
-import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.Font;
 import java.util.ArrayList;
 
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.border.EmptyBorder;
 
 
 public abstract class Equation extends JPanel{
@@ -54,11 +47,10 @@ public abstract class Equation extends JPanel{
     protected JTextField guide;
     private Variable[] variables;
     
+    ButtonListener buttonListener = new ButtonListener();
     ButtonGroup group;
     public String category;
     static Font guideFont = new Font("arial", Font.PLAIN, 18);
-    
-    private static final ArrayList<Field> allFields = new ArrayList();
     
     public Equation(){}
     
@@ -84,7 +76,7 @@ public abstract class Equation extends JPanel{
         
         //set up a panel for a variable
         for(int j = 0; j < names.length; j++){
-            variables[j] = new Variable(names[j], selectable(j));
+            variables[j] = new Variable(names[j], selectable(j), this);
             add(variables[j]);
         }//for panelSetup
         
@@ -111,9 +103,9 @@ public abstract class Equation extends JPanel{
         
         if(updateAll){
             String name = variables[field].text.name;
-            for(Field f: allFields){
-                if(f.name.equals(name)){
-                    f.setText(String.valueOf(round(value)));
+            for(Variable v: variables){
+                if(v.text.name.equals(name)){
+                    v.text.setText(String.valueOf(round(value)));
                 }
             }
         }else{
@@ -168,8 +160,7 @@ public abstract class Equation extends JPanel{
         String selection =(String)JOptionPane.showInputDialog(null,
                 "Due to roots, there were multiple\npossible answers, choose one:",
                 "Multiple answers", JOptionPane.PLAIN_MESSAGE,
-                null, options, answers.get(0)
-        );
+                null, options, answers.get(0));
         
         if(selection != null){
             set(field, Double.valueOf(selection));
@@ -190,83 +181,12 @@ public abstract class Equation extends JPanel{
     }//get
     
     
-    private class Selector extends FocusAdapter{
-        @Override
-        public void focusGained(FocusEvent e){
-            JTextField field = (JTextField)e.getComponent();
-            field.selectAll();
-        }
-    }//selector
-    
-    
-    public class Field extends JTextField{
-        
-        public String name;
-        
-        public Field(String _name, int size){
-            super("", size);
-            
-            name = _name;
-        }
-    }//Field
     
     protected boolean selectable(int i){
         return true;
     }
     
-    private final Selector selector = new Selector();
-    private final ButtonListener buttonListener = new ButtonListener();
-    
-    public class Variable extends JPanel{
-        public Field text;
-        JButton button;
-        
-        public Variable(String name, boolean selectable){
-            
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            setBorder(null);
-            
-            //infotext
-            JTextField f = new JTextField("  " + name);
-            f.setEditable(false);
-            f.setBorder(null);
-            f.setFocusable(false);
-            f.setFont(new Font("arial", 1, 12));
-            
-            text = new Field(name, 7);
-            text.setOpaque(false);
-            text.addFocusListener(selector);
-            text.setBorder(null);
-            allFields.add(text);
-            
-            JPanel p = new JPanel();
-            p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-            p.setBackground(Color.white);
-            p.setBorder(null);
-            p.add(text);
-            
-            if(selectable){
-                button = new JButton(" = ");
-                button.setBorder(new EmptyBorder(2, 2, 2, 2));
-                button.setFocusable(false);
-                button.addActionListener(buttonListener);
-                p.add(button);
-            }else{
-                text.setBorder(new EmptyBorder(2, 2, 2, 2));
-            }
-            
-            add(f);
-            
-            //p2 fixes a weird two-pixel-edge bug
-            JPanel p2 = new JPanel();
-            p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
-            p2.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-            p2.add(p);
-            add(p2);
-        }
-    }
-    
-    private class ButtonListener implements ActionListener{
+    public class ButtonListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
             int k = -1;
@@ -286,4 +206,6 @@ public abstract class Equation extends JPanel{
             }
         }
     }
+    
+    
 }
