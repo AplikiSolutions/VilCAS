@@ -25,9 +25,9 @@
 * the original code.
 */
 
-package vililaskin.categories;
+package vilcas.categories;
 
-import vililaskin.Constants;
+import vilcas.Constants;
 
 
 public class CategoryRaketti extends Category{

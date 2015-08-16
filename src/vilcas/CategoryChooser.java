@@ -25,7 +25,7 @@
 * the original code.
 */
 
-package vililaskin;
+package vilcas;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -33,9 +33,9 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import vililaskin.categories.CategoryFysiikka;
-import vililaskin.categories.CategoryMatematiikka;
-import vililaskin.categories.CategoryRaketti;
+import vilcas.categories.CategoryFysiikka;
+import vilcas.categories.CategoryMatematiikka;
+import vilcas.categories.CategoryRaketti;
 
 public class CategoryChooser extends JPanel{
     

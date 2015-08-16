@@ -32,6 +32,7 @@ import javax.swing.JOptionPane;
 
 public class Solver {
     
+    
     private static final int side1 = 0, side2 = 1, side3 = 2, angle1 = 3, angle2 = 4, angle3 = 5;
     private static double[] values;
     private static boolean[] wasGiven;

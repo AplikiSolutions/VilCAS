@@ -25,14 +25,14 @@
 * the original code.
 */
 
-package vililaskin;
+package vilcas;
 
-import vililaskin.categories.Equation;
+import vilcas.scripter.Scripter;
+import vilcas.categories.Equation;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import vililaskin.scripter.*;
 
 public class MainWindow extends JFrame{
     

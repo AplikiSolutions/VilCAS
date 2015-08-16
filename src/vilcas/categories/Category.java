@@ -25,9 +25,10 @@
 * the original code.
 */
 
-package vililaskin.categories;
+package vilcas.categories;
 
-import vililaskin.scripter.Script;
+import vilcas.Vililaskin;
+import vilcas.scripter.Script;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import vililaskin.*;
 
 
 public class Category extends JPanel{

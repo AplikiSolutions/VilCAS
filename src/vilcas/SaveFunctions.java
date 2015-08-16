@@ -25,9 +25,9 @@
 * the original code.
 */
 
-package vililaskin;
+package vilcas;
 
-import vililaskin.scripter.Script;
+import vilcas.scripter.Script;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import vililaskin.categories.Category;
+import vilcas.categories.Category;
 
 public class SaveFunctions {
     

@@ -25,7 +25,7 @@
 * the original code.
 */
 
-package vililaskin;
+package vilcas;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

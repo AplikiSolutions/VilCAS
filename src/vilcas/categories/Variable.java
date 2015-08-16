@@ -25,7 +25,7 @@
 * the original code.
 */
 
-package vililaskin.categories;
+package vilcas.categories;
 
 import java.awt.Color;
 import java.awt.Font;

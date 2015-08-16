@@ -25,7 +25,7 @@
 * the original code.
 */
 
-package vililaskin.categories;
+package vilcas.categories;
 
 
 public class CategoryMatematiikka extends Category{

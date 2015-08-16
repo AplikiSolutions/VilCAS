@@ -25,12 +25,12 @@
 * the original code.
 */
 
-package vililaskin;
+package vilcas;
 
-import vililaskin.scripter.Script;
+import vilcas.categories.Category;
+import vilcas.scripter.Script;
 import java.util.*;
 import javax.swing.*;
-import vililaskin.categories.*;
 
 
 public class Vililaskin extends JPanel{
