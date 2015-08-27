@@ -93,7 +93,7 @@ public abstract class Equation extends JPanel{
         final int accuracy = 5;
         
         double multiplier = accuracy - 1 - (int)Math.log10(d);
-        return Math.rint(d * Math.pow(10, multiplier)) / Math.pow(10, multiplier);
+        return Math.round(d * Math.pow(10, multiplier)) / Math.pow(10, multiplier);
         
     }//round
     

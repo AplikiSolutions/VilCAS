@@ -70,8 +70,8 @@ public class Constants{
         
         
         //add all known constants
-        Vililaskin.constants.keySet().stream().forEach((s) -> {
-            list.add(new Constant(s, Float.toString(Vililaskin.constants.get(s))));
+        VilCAS.constants.keySet().stream().forEach((s) -> {
+            list.add(new Constant(s, Float.toString(VilCAS.constants.get(s))));
         });
         //sort and add to panel
         refresh();
@@ -155,9 +155,9 @@ public class Constants{
     
     
     private void save(JFrame f){
-        Vililaskin.constants = new HashMap();
+        VilCAS.constants = new HashMap();
         list.stream().forEach((c) -> {
-            Vililaskin.constants.put(c.getName(), c.getValue());
+            VilCAS.constants.put(c.getName(), c.getValue());
         });
         f.dispose();
     }//save

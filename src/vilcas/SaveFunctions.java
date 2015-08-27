@@ -99,7 +99,7 @@ public class SaveFunctions {
                 selectable[i] = !props.getProperty("var_selectable_" + i, "true").equals("false");
             }
             
-            Vililaskin.addScript(new Script(category, name, desc, names, functions, selectable));
+            VilCAS.addScript(new Script(category, name, desc, names, functions, selectable));
         }//add a script
         
         //load constants
@@ -113,7 +113,7 @@ public class SaveFunctions {
         }
         
         props.stringPropertyNames().stream().forEach((s) -> {
-            Vililaskin.constants.put(s, Float.valueOf((String)props.get(s)));
+            VilCAS.constants.put(s, Float.valueOf((String)props.get(s)));
         });
         
         
@@ -129,7 +129,7 @@ public class SaveFunctions {
         
         props2.stringPropertyNames().stream().forEach((s) -> {
             if(props2.get(s).equals("true")){
-                for(Category c: Vililaskin.categories){
+                for(Category c: VilCAS.categories){
                     if(s.startsWith(c.name)){
                         c.checkBox.setSelected(true);
                     }
@@ -153,7 +153,7 @@ public class SaveFunctions {
     
     private static void saveScripts(File targetFile){
         
-        ArrayList<Script> scripts = Vililaskin.getScripts();
+        ArrayList<Script> scripts = VilCAS.getScripts();
         
         if(!targetFile.isDirectory()){
             targetFile.mkdir();
@@ -190,8 +190,8 @@ public class SaveFunctions {
         
         Properties props = new Properties();
         
-        Vililaskin.constants.keySet().stream().forEach((s) -> {
-            props.put(s, Float.toString(Vililaskin.constants.get(s)));
+        VilCAS.constants.keySet().stream().forEach((s) -> {
+            props.put(s, Float.toString(VilCAS.constants.get(s)));
         });
         
         File f = new File(targetFile.getAbsolutePath() +  "\\constants.properties");
@@ -204,7 +204,7 @@ public class SaveFunctions {
         
         Properties props2 = new Properties();
         
-        for(Category c: Vililaskin.categories){
+        for(Category c: VilCAS.categories){
             String s;
             if(c.checkBox.isSelected())
                 s = "true";

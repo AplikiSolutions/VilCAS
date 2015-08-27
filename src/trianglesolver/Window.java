@@ -30,16 +30,20 @@ package trianglesolver;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.*;
-import java.io.*;
-import java.awt.image.*;
-import javax.imageio.*;
 
-public class Window {
+public class Window extends JPanel{
     
-    //TODO: make the picture a real-time view
+    private static double[] values = new double[6];
+    private static CustomField[] fields;
+    private static JPanel imageView;
     
     public void start(){
+        
+        for(int i = 0; i < 3; i++){
+            values[i] = 1;
+            values[i+3] = 60;
+        }
+        
         JFrame frame = new JFrame("Triangle solver");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
@@ -47,20 +51,14 @@ public class Window {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         
-        BufferedImage image = null;
-        try(InputStream stream = getClass().getResourceAsStream("/trianglesolver/Triangle.png")){
-            image = ImageIO.read(stream);
-        }catch(IOException e){
-            JOptionPane.showMessageDialog(null, "Window: " + e);
-        }
-        JLabel imageView = new JLabel(new ImageIcon(image));
-        panel.add(imageView, BorderLayout.PAGE_START);
+        imageView = new Window();
+        panel.add(imageView, BorderLayout.CENTER);
         
         //layout containing textfields and calculate-button
         JPanel p = new JPanel();
         
         //panels containing textFields
-        CustomField[] fields = new CustomField[6];
+        fields = new CustomField[6];
         String[] names = {"a", "b", "c", "A", "B", "C"};
         
         for(int i = 0; i < 3; i++){
@@ -79,8 +77,26 @@ public class Window {
         JButton button = new JButton("Calculate");
         button.addActionListener((ActionEvent e) ->{
             
-            double[] values = new double[6];
-            int counter = 0;
+            
+        });
+        p.add(button);
+        
+        panel.add(p, BorderLayout.PAGE_END);
+        frame.add(panel);
+        
+        frame.setSize(500, 450);
+        frame.setResizable(false);
+        
+        //position frame to center of screen
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation((int)(screen.getWidth() / 2 - frame.getWidth() / 2), 
+            (int)(screen.getHeight() / 2 - frame.getHeight() / 2));
+        frame.setVisible(true);
+    }//start
+    
+    
+    public static void calculate(){
+        int counter = 0;
             
             for(int i = 0; i < fields.length; i++){
                 if(fields[i].isSelected()){
@@ -93,27 +109,50 @@ public class Window {
             
             if(counter >= 2){
                 //solve
-                double[] answers = Solver.solve(values);
-                for(int i = 0; i < answers.length; i++){
-                    fields[i].setValue(answers[i]);
+                values = Solver.solve(values);
+                for(int i = 0; i < values.length; i++){
+                    fields[i].setValue(values[i]);
                 }
+                
+                imageView.repaint();
             }else{
                 JOptionPane.showMessageDialog(null, "You have to give more information");
             }
-        });
-        p.add(button);
+    }
+    
+    
+    @Override
+    public void paint(Graphics g){
+        int ax = 75, ay = getHeight() - 50, bx = getWidth() - 75, by = getHeight() - 50;
+        double scale = (bx - ax) / values[0];
         
-        panel.add(p, BorderLayout.CENTER);
-        frame.add(panel);
+        g.clearRect(0, 0, getWidth(), getHeight());
         
-        frame.pack();
-        frame.setResizable(false);
+        double cx1 = values[1] * Math.cos(Math.PI / 180 * values[5]);
+        double cy1 = values[1] * Math.sin(Math.PI / 180 * values[5]);
         
-        //position frame to center of screen
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation((int)(screen.getWidth() / 2 - frame.getWidth() / 2), 
-            (int)(screen.getHeight() / 2 - frame.getHeight() / 2));
-        frame.setVisible(true);
-    }//start
+        double cx2 = values[2] * Math.cos(Math.PI / 180 * values[4]);
+        double cy2 = values[2] * Math.sin(Math.PI / 180 * values[4]);
+        
+        ax = (int)(getWidth() / 2 - scale * values[0] / 2);
+        bx = (int)(getWidth() / 2 + scale * values[0] / 2);
+        
+        while(!contains(ax + (int)(cx1 * scale), ay - (int)(cy1 * scale)) ||
+                !contains(bx - (int)(cx2 * scale), by - (int)(cy2 * scale))){
+            scale /= 1.1;
+            
+            ax = (int)(getWidth() / 2 - scale * values[0] / 2);
+            bx = (int)(getWidth() / 2 + scale * values[0] / 2);
+        }
+        
+        
+        g.setColor(Color.black);
+        g.drawLine(ax, ay, bx, by);
+        g.drawLine(ax, ay, ax + (int)(cx1 * scale), ay - (int)(cy1 * scale));
+        g.drawLine(bx, by, bx - (int)(cx2 * scale), by - (int)(cy2 * scale));
+        
+        
+        
+    }//paint
     
 }

@@ -27,7 +27,7 @@
 
 package vilcas.categories;
 
-import vilcas.Vililaskin;
+import vilcas.VilCAS;
 import vilcas.scripter.Script;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -60,7 +60,7 @@ public class Category extends JPanel{
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
         checkBox.addActionListener((ActionEvent e) -> {
-            Vililaskin.updateCategory(Category.this);
+            VilCAS.updateCategory(Category.this);
         });
         addEquations();
         

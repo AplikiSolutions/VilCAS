@@ -35,7 +35,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.border.EmptyBorder;
 import vilcas.CategoryChooser;
-import vilcas.Vililaskin;
+import vilcas.VilCAS;
 
 
 public class Scripter{
@@ -59,9 +59,9 @@ public class Scripter{
         panel.add(info("Category", null));
         
         //get category names
-        String[] categoryNames = new String[Vililaskin.categories.size()];
-        for(int i = 0; i < Vililaskin.categories.size(); i++)
-            categoryNames[i] = Vililaskin.categories.get(i).name;
+        String[] categoryNames = new String[VilCAS.categories.size()];
+        for(int i = 0; i < VilCAS.categories.size(); i++)
+            categoryNames[i] = VilCAS.categories.get(i).name;
         
         //Category chooser
         JComboBox catField = new JComboBox(categoryNames);
@@ -180,7 +180,7 @@ public class Scripter{
                 }
                 
                 frame.dispose();
-                Vililaskin.addScript(new Script(category, name, desc, names, functions, selectable));
+                VilCAS.addScript(new Script(category, name, desc, names, functions, selectable));
                 
             }catch(Exception ex){
                 JOptionPane.showMessageDialog(null, ex);
@@ -222,9 +222,9 @@ public class Scripter{
         panel.add(info("Category", null));
         
         //get category names
-        String[] categoryNames = new String[Vililaskin.categories.size()];
-        for(int i = 0; i < Vililaskin.categories.size(); i++)
-            categoryNames[i] = Vililaskin.categories.get(i).name;
+        String[] categoryNames = new String[VilCAS.categories.size()];
+        for(int i = 0; i < VilCAS.categories.size(); i++)
+            categoryNames[i] = VilCAS.categories.get(i).name;
         
         //Category chooser
         JComboBox catField = new JComboBox(categoryNames);
@@ -278,7 +278,7 @@ public class Scripter{
         JButton deleteButton = new JButton("delete script");
         deleteButton.addActionListener((ActionEvent e) -> {
             frame.dispose();
-            Vililaskin.removeScript(s);
+            VilCAS.removeScript(s);
         });
         
         JPanel p = new JPanel();

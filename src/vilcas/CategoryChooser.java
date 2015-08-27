@@ -43,9 +43,9 @@ public class CategoryChooser extends JPanel{
     public CategoryChooser(){}
     
     public void initCategories(){
-        Vililaskin.addCategory(new CategoryMatematiikka());
-        Vililaskin.addCategory(new CategoryFysiikka());
-        Vililaskin.addCategory(new CategoryRaketti());
+        VilCAS.addCategory(new CategoryMatematiikka());
+        VilCAS.addCategory(new CategoryFysiikka());
+        VilCAS.addCategory(new CategoryRaketti());
     }
     
     

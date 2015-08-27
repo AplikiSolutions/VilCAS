@@ -42,6 +42,7 @@ public class Solver {
         
         values = in;
         wasGiven = new boolean[in.length];
+        //update wasGiven to tell if given
         for(int i = 0; i < in.length; i++){
             wasGiven[i] = !Double.isNaN(in[i]);
         }
@@ -105,13 +106,14 @@ public class Solver {
             
             
             //a = 2bcos(C) +- sqrt(4b^2cos(C)^2 - 4*(b^2 - c^2)) / 2
-            //a = s3, b =s2, c = s1
+            //a = s3, b = s2, c = s1
                 
             double ans1 = 4 * values[s2] * values[s2] * cos(opposite(s1)) * cos(opposite(s1));
             ans1 -= 4 * (values[s2] * values[s2] - values[s1] * values[s1]);
             ans1 = Math.sqrt(ans1);
             ans1 += 2 * values[s2] * cos(values[opposite(s1)]);
             ans1 /= 2;
+            
             double ans2 = 4 * values[s2] * values[s2] * cos(opposite(s1)) * cos(opposite(s1));
             ans2 -= 4 * (values[s2] * values[s2] - values[s1] * values[s1]);
             ans2 = - Math.sqrt(ans2);
@@ -119,9 +121,11 @@ public class Solver {
             ans2 /= 2;
             
             if(ans1 > 0 && ans2 > 0){
+                
                 int selection = JOptionPane.showConfirmDialog(null, 
                             "Does the triangle have an obtuse angle?",
                             "Multiple answers", JOptionPane.YES_NO_OPTION);
+                
                 if(selection == JOptionPane.YES_OPTION){
                     values[s3] = ans1;
                 }else if(selection == JOptionPane.NO_OPTION){

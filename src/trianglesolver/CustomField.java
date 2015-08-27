@@ -65,6 +65,10 @@ public class CustomField extends JPanel{
                 checkBox.setSelected(!field.getText().isEmpty());
             }
         });
+        field.addActionListener((ActionEvent e) -> {
+            Window.calculate();
+        });
+        
         checkBox = new JCheckBox();
         checkBox.setBorder(null);
         checkBox.setFocusable(false);

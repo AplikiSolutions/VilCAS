@@ -35,14 +35,15 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.swing.JButton;
-import vilcas.Vililaskin;
-import vilcas.Vililaskin;
-import vilcas.scripter.Scripter;
+import vilcas.VilCAS;
 
 public class Script extends Equation{
     
     public customVariable[] vars;
     public String name, tooltip;
+    
+    private static ScriptEngine engine;
+    
     
     
     public Script(String category, String name, String desc, String[] names, String[] functions, boolean[] selectable){
@@ -74,17 +75,16 @@ public class Script extends Equation{
         guide.setToolTipText(desc);
         
         if(!this.category.equals(category)){
-            Vililaskin.removeScript(this);
+            VilCAS.removeScript(this);
             this.category = category;
-            Vililaskin.addScript(this);
+            VilCAS.addScript(this);
         }
     }
     
     //evaluate script
     @Override
     public void calculate(int object) throws Exception{
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("JavaScript");
+        
         
         for(int i = 0; i < vars.length; i++){
             if(i == object)
@@ -93,8 +93,8 @@ public class Script extends Equation{
             engine.put(vars[i].name, get(i));
         }
         
-        Vililaskin.constants.keySet().stream().forEach((s) -> {
-            engine.put(s, Vililaskin.constants.get(s));
+        VilCAS.constants.keySet().stream().forEach((s) -> {
+            engine.put(s, VilCAS.constants.get(s));
         });
         
         try{
@@ -108,7 +108,8 @@ public class Script extends Equation{
     @Override
     public boolean selectable(int object){
         return vars[object].selectable;
-    }
+    }//selectable
+    
     
     public static class customVariable{
         public String name, function;
@@ -119,5 +120,12 @@ public class Script extends Equation{
             this.function = function;
             this.selectable = editable;
         }
-    }
+    }//customVariable
+    
+    
+    
+    public static void init(){
+        ScriptEngineManager manager = new ScriptEngineManager();
+        engine = manager.getEngineByName("JavaScript");
+    }//init
 }

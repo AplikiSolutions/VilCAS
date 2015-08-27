@@ -87,7 +87,7 @@ public class MainWindow extends JFrame{
         addWindowListener(new WindowAdapter(){
             @Override
             public void windowClosing(WindowEvent e){
-                Vililaskin.quit();
+                VilCAS.quit();
             }
         });
     }//build
@@ -190,18 +190,18 @@ public class MainWindow extends JFrame{
         
         JMenuItem viewAll = new JMenuItem("All functions", KeyEvent.VK_A);
         viewAll.addActionListener((ActionEvent e) -> {
-            Vililaskin.categories.stream().forEach((c) -> {
+            VilCAS.categories.stream().forEach((c) -> {
                 c.checkBox.setSelected(true);
-                Vililaskin.updateCategory(c);
+                VilCAS.updateCategory(c);
             });
         });
         menuItem.add(viewAll);
         
         JMenuItem viewNone = new JMenuItem("No functions", KeyEvent.VK_N);
         viewNone.addActionListener((ActionEvent e) -> {
-            Vililaskin.categories.stream().forEach((c) -> {
+            VilCAS.categories.stream().forEach((c) -> {
                 c.checkBox.setSelected(false);
-                Vililaskin.updateCategory(c);
+                VilCAS.updateCategory(c);
             });
         });
         menuItem.add(viewNone);
@@ -224,8 +224,8 @@ public class MainWindow extends JFrame{
         JMenu menuItem = new JMenu("Extensions");
         menuItem.setMnemonic('X');
         
-        JMenuItem viewAll = new JMenuItem("Triangle solver", KeyEvent.VK_T);
-        viewAll.addActionListener((ActionEvent e) -> {
+        JMenuItem triangleSolver = new JMenuItem("Triangle solver", KeyEvent.VK_T);
+        triangleSolver.addActionListener((ActionEvent e) -> {
             try{
                 new trianglesolver.Window().start();
             }catch(Exception ex){
@@ -233,7 +233,18 @@ public class MainWindow extends JFrame{
                 ex.printStackTrace(System.out);
             }
         });
-        menuItem.add(viewAll);
+        menuItem.add(triangleSolver);
+        
+        JMenuItem grapher = new JMenuItem("Grapher", KeyEvent.VK_G);
+        grapher.addActionListener((ActionEvent e) -> {
+            try{
+                new grapher.Window().start();
+            }catch(Exception ex){
+                JOptionPane.showMessageDialog(null, "MainWindow: " + ex);
+                ex.printStackTrace(System.out);
+            }
+        });
+        menuItem.add(grapher);
         
         return menuItem;
     }//makeWindow
