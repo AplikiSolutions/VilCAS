@@ -62,7 +62,7 @@ public class VilCAS extends JPanel{
                     Script.init();
 
                     //init grapher's Javascript engine
-                    grapher.Graph.init();
+                    grapher.FunctionField.init();
                 }
             }.start();
             

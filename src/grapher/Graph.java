@@ -30,10 +30,9 @@ package grapher;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
 public class Graph extends JPanel{
     
@@ -41,7 +40,8 @@ public class Graph extends JPanel{
     //offset is in panel's coordinate system
     private int offsetX, offsetY, mouseX = 0, mouseY = 0;
     private boolean resetView = true;
-    private static ScriptEngine engine;
+    private final ArrayList<FunctionField> functions = new ArrayList();
+    private static FunctionField active;
     
     public Graph(){
         setBackground(Color.white);
@@ -59,6 +59,9 @@ public class Graph extends JPanel{
     
     @Override
     public void paint(Graphics g){
+        //clear background
+        g.setColor(Color.white);
+        g.fillRect(0, 0, getWidth(), getHeight());
         
         if(resetView){
             resetView = false;
@@ -68,68 +71,37 @@ public class Graph extends JPanel{
             scaleY = -0.01;
         }
         
-        //clear background
-        g.setColor(Color.white);
-        g.fillRect(0, 0, getWidth(), getHeight());
+        //draw functions
+        functions.stream().forEach((f) -> {
+            f.draw(this, g);
+        });
         
+        //draw value of active function from mouse
         try{
-            engine.put("x", 0);
-            engine.eval(Window.getEquation());
-            
-        }catch(Exception e){
-            drawAxes(g);
-            
-            return;
-        }
-        
-        g.setColor(Color.red);
-        
-        double lasty = 0;
-
-        for(int i = -1; i < getWidth(); i += 2){
-            engine.put("x", xToGraph(i));
-
-            double y = 0;
-            try{
-                y = yToPanel(((Number)(engine.eval(Window.getEquation()))).doubleValue());
-            }catch(Exception e){
-                break;
-            }
-            
-            if(contains(i - 1, (int)Math.round(lasty)) || contains(i, (int)Math.round(y)))
-                g.drawLine(i - 1, (int)Math.round(lasty), i, (int)Math.round(y));
-
-            lasty = y;
-        }
-        
-        try{
-            engine.put("x", xToGraph(mouseX));
-            double yExact = ((Number)(engine.eval(Window.getEquation()))).doubleValue();
+            double yExact = active.getValue(xToGraph(mouseX));
             int y = (int)yToPanel(yExact);
             
             g.setColor(Color.gray);
             g.drawLine(mouseX, mouseY, mouseX, y);
+            g.drawLine(mouseX, mouseY, mouseX, (int)yToPanel(0));
             g.drawLine(mouseX, y, (int)xToPanel(0), y);
             
-            g.drawString("(" + round(xToGraph(mouseX)) + ", " + round(yExact) + ")",
+            g.drawString("(" + format(xToGraph(mouseX)) + ", " + format(yExact) + ")",
                     mouseX + 5, mouseY);
         }catch(Exception ex){}
-        
         
         drawAxes(g);
         
     }//drawGraph
     
+    
     public void drawAxes(Graphics g){
-        //draw axes
-        g.setColor(Color.black);
-        g.drawLine((int)xToPanel(0), 0, (int)xToPanel(0), getHeight());
-        g.drawLine(0, (int)yToPanel(0), getWidth(), (int)yToPanel(0));
+        
         
         g.setColor(Color.gray);
         
         //draw y-values
-        double logY = Math.log10(-scaleY) + 2; // + 2 sets frequency
+        double logY = Math.log10(-scaleY) + 1.8; // + 2 sets frequency
         int exponent = (int)Math.floor(logY); //rounds down
         
         int multiplier = 1;
@@ -145,23 +117,24 @@ public class Graph extends JPanel{
         
         while(yToPanel(y) < getHeight()){
             
-            if(Math.abs(y) < gap / 2){ //dont draw zero
-            }else if(xToPanel(0) < 0){
-                //draws value to left wall
-                g.drawLine(0, (int)yToPanel(y), 5, (int)yToPanel(y));
-                g.drawString(round(y), 8, (int)yToPanel(y) + 5);
+            int lineX, textX;
+            if(xToPanel(0) < 5){//draws value to top wall
+                lineX = 0;
+                textX = 8;
                 
-            }else if(xToPanel(0) > getWidth()){
-                //draws value to rigth wall
-                g.drawLine(getWidth(), (int)yToPanel(y), getWidth() - 5, (int)yToPanel(y));
-                g.drawString(round(y), 
-                        (int)(getWidth() - getFontMetrics(getFont()).getStringBounds(round(y), g).getWidth() - 8), 
-                        (int)yToPanel(y) + 5);
+            }else if(xToPanel(0) > getWidth() - 5){//draws value to bottom wall
+                lineX = getWidth() - 5;
+                textX = (int)(getWidth() - stringWidth(format(y)) - 8);
                 
-            }else{
-                //draws value next to axis
-                g.drawLine((int)xToPanel(0) - 2, (int)yToPanel(y), (int)xToPanel(0) + 2, (int)yToPanel(y));
-                g.drawString(round(y), (int)xToPanel(0) + 5, (int)yToPanel(y) + 5);
+            }else{//draws value next to axis
+                lineX = (int)xToPanel(0) - 3;
+                textX = (int)xToPanel(0) + 5;
+            }
+            
+            if(Math.abs(y) > gap / 2){ //dont draw zero
+                //draw value
+                g.drawLine(lineX, (int)yToPanel(y), lineX + 5, (int)yToPanel(y));
+                g.drawString(format(y), textX, (int)yToPanel(y) + stringHeight(format(y)) / 2 - 1);
             }
             
             y -= gap; //go to next y-value
@@ -169,7 +142,7 @@ public class Graph extends JPanel{
         
         
         //draw x-values
-        double logX = Math.log10(scaleX) + 2; // + 2 sets frequency
+        double logX = Math.log10(scaleX) + 1.8; // + 2 sets frequency
         exponent = (int)Math.floor(logX); //rounds down
         
         
@@ -185,36 +158,46 @@ public class Graph extends JPanel{
         
         while(xToPanel(x) < getWidth()){
             
-            if(Math.abs(x) < gap / 2){ //dont draw zero
-            }else if(yToPanel(0) < 0){
-                //draws value to left wall
-                g.drawLine((int)xToPanel(x), 0, (int)xToPanel(x), 5);
-                g.drawString(round(x), 20, (int)xToPanel(x) - 5);
+            int lineY, textY;
+            if(yToPanel(0) < 5){//draws value to top wall
+                lineY = 0;
+                textY = 8 + stringHeight(format(x));
                 
-            }else if(yToPanel(0) > getHeight()){
-                //draws value to rigth wall
-                g.drawLine((int)xToPanel(x), getHeight(), (int)xToPanel(x), getHeight() - 5);
-                g.drawString(round(x), (int)(getHeight() - 8), (int)xToPanel(x) - 5);
+            }else if(yToPanel(0) > getHeight() - 5){//draws value to bottom wall
+                lineY = getHeight() - 5;
+                textY = (int)(getHeight() - 8);
                 
-            }else{
-                //draws value next to axis
-                g.drawLine((int)xToPanel(x), (int)yToPanel(0) - 2, (int)xToPanel(x), (int)yToPanel(0) + 2);
-                g.drawString(round(x), (int)xToPanel(x) - 5, (int)yToPanel(0) - 5);
+            }else{//draws value next to axis
+                lineY = (int)yToPanel(0) - 3;
+                textY = (int)yToPanel(0) - 5;
             }
             
-            x += gap; //go to next y-value
+            if(Math.abs(x) > gap / 2){ //dont draw zero
+                //draw value
+                g.drawLine((int)xToPanel(x), lineY, (int)xToPanel(x), lineY + 5);
+                g.drawString(format(x), (int)(xToPanel(x) - stringWidth(format(x)) / 2), textY);
+            }
+            
+            x += gap; //go to next x-value
         }
         
-    }
+        
+        //draw axes
+        g.setColor(Color.black);
+        g.drawLine((int)xToPanel(0), 0, (int)xToPanel(0), getHeight());
+        g.drawLine(0, (int)yToPanel(0), getWidth(), (int)yToPanel(0));
+    }//drawAxes
     
-    private String round(double d){
-//        final int accuracy = 3;
-//        
-//        double e = accuracy - 1 - (int)Math.log10(Math.abs(d));
-//        
-//        return Math.round(d * Math.pow(10, e)) / Math.pow(10, e);
-        
-        
+    
+    private int stringWidth(String s){
+        return (int)getFontMetrics(getFont()).getStringBounds(s, getGraphics()).getWidth();
+    }//stringWidth
+    
+    private int stringHeight(String s){
+        return (int)getFontMetrics(getFont()).getStringBounds(s, getGraphics()).getHeight();
+    }//stringHeight
+    
+    private String format(double d){
         DecimalFormat f;
         if(Math.abs(d) < 1000 && Math.abs(d) > 0.01)
             f = new DecimalFormat("##0.###");
@@ -226,22 +209,36 @@ public class Graph extends JPanel{
         f.setDecimalFormatSymbols(dfs);
         
         return f.format(d);
-    }
+    }//format
     
-    private double xToGraph(double x){
+    
+    public double xToGraph(double x){
         return (x - offsetX) * scaleX;
-    }
-    
-    private double yToGraph(double y){
+    }//xToGraph
+    public double yToGraph(double y){
         return (y - offsetY) * scaleY;
-    }
-    
-    private double xToPanel(double x){
+    }//yToGraph
+    public double xToPanel(double x){
         return x / scaleX + offsetX;
-    }
-    
-    private double yToPanel(double y){
+    }//xToPanel
+    public double yToPanel(double y){
         return y / scaleY + offsetY;
+    }//yToPanel
+    
+    
+    public void addFunction(FunctionField f){
+        functions.add(f);
+    }//addFunction
+    
+    public void remove(FunctionField f){
+        functions.remove(f);
+        if(f.equals(active))
+            if(!functions.isEmpty())
+                active = functions.get(0);
+    }//addFunction
+    
+    public static void setActive(FunctionField f){
+        active = f;
     }
     
     private class Dragger extends MouseAdapter{
@@ -258,20 +255,20 @@ public class Graph extends JPanel{
             mouseY = e.getY();
             
             repaint();
-        }
+        }//mouseDragged
         
         @Override
         public void mouseMoved(MouseEvent e){
             mouseX = e.getX();
             mouseY = e.getY();
             repaint();
-        }
+        }//mouseMoved
         
         @Override
         public void mousePressed(MouseEvent e){
             lastX = e.getX();
             lastY = e.getY();
-        }
+        }//mousePressed
         
         @Override
         public void mouseWheelMoved(MouseWheelEvent e){
@@ -285,12 +282,7 @@ public class Graph extends JPanel{
             scaleY *= k;
             
             repaint();
-        }
-    }
-    
-    public static void init(){
-        ScriptEngineManager manager = new ScriptEngineManager();
-        engine = manager.getEngineByName("JavaScript");
-    }//init
+        }//mouseWheelMoved
+    }//Dragger
     
 }
