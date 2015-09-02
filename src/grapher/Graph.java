@@ -34,14 +34,17 @@ import java.util.ArrayList;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
+
 public class Graph extends JPanel{
     
-    private double scaleX, scaleY;
+    
+    public double scaleX, scaleY;
     //offset is in panel's coordinate system
     private int offsetX, offsetY, mouseX = 0, mouseY = 0;
     private boolean resetView = true;
     private final ArrayList<FunctionField> functions = new ArrayList();
-    private static FunctionField active;
+    
+    private final JFrame frame;
     
     public Graph(){
         setBackground(Color.white);
@@ -50,6 +53,26 @@ public class Graph extends JPanel{
         addMouseListener(dragger);
         addMouseMotionListener(dragger);
         addMouseWheelListener(dragger);
+        
+        frame = new JFrame("Graph");
+        setOpaque(false);
+        frame.add(this);
+        
+        frame.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e){
+                Window.close();
+            }
+        });
+        
+        frame.setSize(500, 500);
+        frame.setMinimumSize(new Dimension(300, 300));
+        
+        //position frame to center of screen
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation((int)(screen.getWidth() / 2 - frame.getWidth()), 
+            (int)(screen.getHeight() / 2 - frame.getHeight() / 2));
+        frame.setVisible(true);
     }//graph
     
     public void resetView(){
@@ -73,22 +96,23 @@ public class Graph extends JPanel{
         
         //draw functions
         functions.stream().forEach((f) -> {
-            f.draw(this, g);
+            f.draw(g);
         });
         
         //draw value of active function from mouse
-        try{
-            double yExact = active.getValue(xToGraph(mouseX));
-            int y = (int)yToPanel(yExact);
-            
-            g.setColor(Color.gray);
-            g.drawLine(mouseX, mouseY, mouseX, y);
-            g.drawLine(mouseX, mouseY, mouseX, (int)yToPanel(0));
-            g.drawLine(mouseX, y, (int)xToPanel(0), y);
-            
-            g.drawString("(" + format(xToGraph(mouseX)) + ", " + format(yExact) + ")",
-                    mouseX + 5, mouseY);
-        }catch(Exception ex){}
+        if(FunctionField.isInitialized())
+            try{
+                double yExact = FunctionOptions.getActive().getSavedValue(mouseX);
+                int y = (int)yToPanel(yExact);
+
+                g.setColor(Color.gray);
+                g.drawLine(mouseX, mouseY, mouseX, y);
+                g.drawLine(mouseX, mouseY, mouseX, (int)yToPanel(0));
+                g.drawLine(mouseX, y, (int)xToPanel(0), y);
+
+                g.drawString("(" + format(xToGraph(mouseX)) + ", " + format(yExact) + ")",
+                        mouseX + 5, mouseY);
+            }catch(Exception ex){}
         
         drawAxes(g);
         
@@ -101,7 +125,7 @@ public class Graph extends JPanel{
         g.setColor(Color.gray);
         
         //draw y-values
-        double logY = Math.log10(-scaleY) + 1.8; // + 2 sets frequency
+        double logY = Math.log10(-scaleY) + 2; // + 2 sets frequency
         int exponent = (int)Math.floor(logY); //rounds down
         
         int multiplier = 1;
@@ -142,7 +166,7 @@ public class Graph extends JPanel{
         
         
         //draw x-values
-        double logX = Math.log10(scaleX) + 1.8; // + 2 sets frequency
+        double logX = Math.log10(scaleX) + 2; // + 2 sets frequency
         exponent = (int)Math.floor(logX); //rounds down
         
         
@@ -197,12 +221,12 @@ public class Graph extends JPanel{
         return (int)getFontMetrics(getFont()).getStringBounds(s, getGraphics()).getHeight();
     }//stringHeight
     
-    private String format(double d){
+    public String format(double d){
         DecimalFormat f;
         if(Math.abs(d) < 1000 && Math.abs(d) > 0.01)
-            f = new DecimalFormat("##0.###");
+            f = new DecimalFormat("0.######");
         else
-            f = new DecimalFormat("0.##E0");
+            f = new DecimalFormat("0.######E0");
         
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
@@ -228,18 +252,20 @@ public class Graph extends JPanel{
     
     public void addFunction(FunctionField f){
         functions.add(f);
+        repaint();
     }//addFunction
     
     public void remove(FunctionField f){
         functions.remove(f);
-        if(f.equals(active))
-            if(!functions.isEmpty())
-                active = functions.get(0);
+        if(!functions.isEmpty()){
+            functions.get(functions.size() - 1).setActive();
+            FunctionOptions.setActive(functions.get(functions.size() - 1));
+        }
     }//addFunction
     
-    public static void setActive(FunctionField f){
-        active = f;
-    }
+    public void close(){
+        frame.dispose();
+    }//close
     
     private class Dragger extends MouseAdapter{
         

@@ -34,28 +34,33 @@ import javax.swing.border.*;
 
 public class Window {
     
-    private static final JPanel fieldPanel;
-    private static final Graph graph;
-    
-    static{
-        graph = new Graph();
-        fieldPanel = new JPanel();
-        fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.Y_AXIS));
-    }
+    private static JFrame frame;
+    private static JPanel fieldPanel, backPanel;
+    private static Graph graph;
+    private static JScrollPane scrollPane;
+    private static boolean graphOpen = false;
     
     public void start(){
         
-        JFrame frame = new JFrame("Grapher");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        if(graphOpen){
+            JOptionPane.showMessageDialog(null, "Grapher is already open");
+            return;
+        }
         
-        JPanel panel = new JPanel();
-        panel.setBorder(new EmptyBorder(0, 15, 10, 15));
-        panel.setLayout(new BorderLayout());
+        graphOpen = true;
+        
+        frame = new JFrame("Grapher");
+        
+        backPanel = new JPanel();
+        backPanel.setBorder(new EmptyBorder(0, 15, 10, 15));
+        backPanel.setLayout(new BorderLayout());
+        
+        graph = new Graph();
         
         JPanel topPanel = new JPanel();
+        topPanel.setFocusable(false);
         
         JButton resetViewButton = new JButton("reset view");
-        resetViewButton.setFocusable(false);
         resetViewButton.addActionListener((ActionEvent e) -> {
             graph.resetView();
         });
@@ -67,45 +72,75 @@ public class Window {
         });
         topPanel.add(addFunctionButton);
         
-        panel.add(topPanel, BorderLayout.PAGE_START);
-        
-        graph.setOpaque(false);
-        panel.add(graph, BorderLayout.CENTER);
+        backPanel.add(topPanel, BorderLayout.PAGE_START);
         
         
-        FunctionField field = new FunctionField("Math.sin(x)");
-        addFunction(field);
-        panel.add(fieldPanel, BorderLayout.PAGE_END);
+        fieldPanel = new JPanel();
+        fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.Y_AXIS));
+        fieldPanel.setMinimumSize(new Dimension(400, 125));
+        
+        JPanel midpanel = new JPanel();
+        midpanel.add(fieldPanel);
+        
+        scrollPane = new JScrollPane(midpanel);
+        backPanel.add(scrollPane, BorderLayout.CENTER);
         
         
-        frame.add(panel);
+        frame.add(backPanel);
         
-        frame.setSize(600, 500);
-        frame.setMinimumSize(new Dimension(475, 400));
+        frame.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e){
+                close();
+            }
+        });
+        
+        frame.setSize(500, 300);
+        frame.setMinimumSize(new Dimension(500, 200));
         //position frame to center of screen
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation((int)(screen.getWidth() / 2 - frame.getWidth() / 2), 
+        frame.setLocation((int)(screen.getWidth() / 2), 
             (int)(screen.getHeight() / 2 - frame.getHeight() / 2));
         frame.setVisible(true);
         
+        initFunctionOptions();
+        
+        FunctionField.setGraph(graph);
+        FunctionField field = new FunctionField("Math.sin(x)");
+        addFunction(field);
         
     }//start
     
     public static void addFunction(FunctionField f){
         fieldPanel.add(f);
-        fieldPanel.revalidate();
+        scrollPane.revalidate();
         graph.addFunction(f);
     }//addFunction
     
+    public static void initFunctionOptions(){
+        backPanel.add(new FunctionOptions(), BorderLayout.PAGE_END);
+        backPanel.revalidate();
+    }//initFunctionOptions
+    
     public static void remove(FunctionField f){
         fieldPanel.remove(f);
-        fieldPanel.revalidate();
+        scrollPane.revalidate();
         graph.remove(f);
     }//remove
     
     public static void repaint(){
-        graph.repaint();
+        if(graph != null)
+            graph.repaint();
     }//repaint
     
+    public static boolean graphOpen(){
+        return graphOpen;
+    }//graphOpen
+    
+    public static void close(){
+        graphOpen = false;
+        graph.close();
+        frame.dispose();
+    }//close
     
 }
