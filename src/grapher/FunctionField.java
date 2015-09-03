@@ -44,11 +44,12 @@ public class FunctionField extends JPanel{
     private static ScriptEngine engine;
     private static Graph graph;
     
-    private final JTextField field;
+    private final JTextField field, infoText;
     private final JRadioButton activeButton;
     private Color color;
     private int diff;
     private double[] values;
+    private boolean updateDiff = false;
     
     static{
         activeButtonGroup = new ButtonGroup();
@@ -86,7 +87,8 @@ public class FunctionField extends JPanel{
         FunctionOptions.setActive(this);
         panel.add(activeButton);
         
-        JTextField infoText = new JTextField(" f(x) =");
+        infoText = new JTextField(" y =", 3);
+        infoText.setHorizontalAlignment(JTextField.RIGHT);
         infoText.setEditable(false);
         infoText.setBorder(null);
         infoText.setFocusable(false);
@@ -121,6 +123,12 @@ public class FunctionField extends JPanel{
     
     
     public void draw(Graphics g){
+        
+        if(updateDiff){
+            String[] s = {" y =", " y = D", " y = ∫"};
+            infoText.setText(s[diff]);
+        }
+            
         
         values = new double[graph.getWidth()];
         
@@ -226,6 +234,7 @@ public class FunctionField extends JPanel{
     
     public void setDiff(int i){
         diff = i;
+        updateDiff = true;
     }//setDiff
     public int getDiff(){
         return diff;
