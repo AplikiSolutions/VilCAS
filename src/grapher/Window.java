@@ -56,15 +56,21 @@ public class Window {
         backPanel.setLayout(new BorderLayout());
         
         graph = new Graph();
+        graph.setLayout(new BorderLayout());
         
         JPanel topPanel = new JPanel();
         topPanel.setFocusable(false);
         
         JButton resetViewButton = new JButton("reset view");
+        resetViewButton.setFocusable(false);
         resetViewButton.addActionListener((ActionEvent e) -> {
             graph.resetView();
         });
-        topPanel.add(resetViewButton);
+        JPanel midp = new JPanel();
+        midp.setLayout(new BorderLayout());
+        midp.add(resetViewButton, BorderLayout.LINE_START);
+        midp.setOpaque(false);
+        graph.add(midp, BorderLayout.PAGE_START);
         
         JButton addFunctionButton = new JButton("add function");
         addFunctionButton.addActionListener((ActionEvent e) -> {

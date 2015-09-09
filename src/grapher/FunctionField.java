@@ -116,6 +116,22 @@ public class FunctionField extends JPanel{
         
         panel.add(field);
         
+        
+        JButton colorChooser = new JButton("");
+        colorChooser.setBorder(new EmptyBorder(10, 10, 10, 10));
+        colorChooser.setBackground(color);
+        colorChooser.addActionListener((ActionEvent e) -> {
+            Color c = JColorChooser.showDialog(null, "Choose color", color);
+            
+            if(c != null){
+                color = c;
+            
+                colorChooser.setBackground(c);
+                Window.repaint();
+            }
+        });
+        panel.add(colorChooser);
+        
         add(panel);
     }//FunctionField
     
@@ -147,7 +163,7 @@ public class FunctionField extends JPanel{
             
         }else{//diff == INTEGRATE
             
-            double y = 0;//graph's coordinate system
+            double y = -getValue(0) * (-graph.scaleY) / 2;//graph's coordinate system
             double increment;
             
             //positive direction
@@ -159,10 +175,10 @@ public class FunctionField extends JPanel{
                 y += increment;
                 
                 if(x >= 0)
-                    values[x] = y;
+                    values[x] = y - increment / 2;
             }
             
-            y = 0;
+            y = getValue(0) * (-graph.scaleY) / 2;
             //negative direction
             for(int x = (int)graph.xToPanel(0); x >= 0; x--){
                 increment = getValue(graph.xToGraph(x)) * (-graph.scaleY);
@@ -172,7 +188,7 @@ public class FunctionField extends JPanel{
                 y -= increment;
                 
                 if(x < graph.getWidth())
-                    values[x] = y;
+                    values[x] = y + increment / 2;
             }
             
         }
@@ -184,7 +200,7 @@ public class FunctionField extends JPanel{
             
             //don't draw if outside of panel
             if(graph.contains(x - 2, lasty) || graph.contains(x - 1, y))
-                if(!Double.isNaN(y) && !Double.isNaN(lasty))
+                if(Double.isFinite(y) && Double.isFinite(lasty))
                     g.drawLine(x - 1, lasty, x, y);
             
             lasty = y;
@@ -228,9 +244,6 @@ public class FunctionField extends JPanel{
     public Color getColor(){
         return color;
     }//getColor
-    public void setColor(Color c){
-        color = c;
-    }//setColor
     
     public void setDiff(int i){
         diff = i;

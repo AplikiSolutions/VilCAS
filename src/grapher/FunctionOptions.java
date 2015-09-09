@@ -27,16 +27,13 @@
 
 package grapher;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
-import javax.swing.border.*;
 
 public class FunctionOptions extends JPanel{
     
     private static FunctionField active;
     private static JComboBox diffChooser;
-    private static JButton colorChooser;
     
     public FunctionOptions(){
         
@@ -61,23 +58,6 @@ public class FunctionOptions extends JPanel{
         add(diffChooser);
         
         
-        colorChooser = new JButton("");
-        colorChooser.setBorder(new EmptyBorder(10, 10, 10, 10));
-        colorChooser.setBackground(Color.white);
-        colorChooser.addActionListener((ActionEvent e) -> {
-            if(active == null)
-                return;
-            Color c = JColorChooser.showDialog(null, "Choose color", active.getColor());
-            
-            if(c != null){
-                active.setColor(c);
-            
-                colorChooser.setBackground(c);
-                Window.repaint();
-            }
-        });
-        add(colorChooser);
-        
         JButton removeButton = new JButton("remove");
         //removeButton.setBorder(new LineBorder(Color.gray));
         removeButton.setFocusable(false);
@@ -93,7 +73,6 @@ public class FunctionOptions extends JPanel{
         active = f;
         
         diffChooser.setSelectedIndex(active.getDiff());
-        colorChooser.setBackground(active.getColor());
     }//setActive
     
     public static FunctionField getActive(){

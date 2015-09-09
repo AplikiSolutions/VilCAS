@@ -116,6 +116,7 @@ public class Graph extends JPanel{
         
         drawAxes(g);
         
+        super.paint(g);
     }//drawGraph
     
     
@@ -224,9 +225,9 @@ public class Graph extends JPanel{
     public String format(double d){
         DecimalFormat f;
         if(Math.abs(d) < 1000 && Math.abs(d) > 0.01)
-            f = new DecimalFormat("0.######");
+            f = new DecimalFormat("0.####");
         else
-            f = new DecimalFormat("0.######E0");
+            f = new DecimalFormat("0.####E0");
         
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
