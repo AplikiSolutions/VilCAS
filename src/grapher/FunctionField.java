@@ -34,7 +34,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 public class FunctionField extends JPanel{
-    
+    //random comment
     public static final int NONE = 0, DERIVE = 1, INTEGRATE = 2;
     
     private static final Color[] colors = {Color.red, Color.green, Color.blue, Color.orange, Color.magenta};
